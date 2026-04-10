@@ -1,213 +1,609 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Churn Prediction</title>
-
-<style>
-body {
-  font-family: 'Segoe UI', sans-serif;
-  margin: 0;
-  background: linear-gradient(135deg, #141e30, #243b55);
-  color: white;
-}
-
-header {
-  text-align: center;
-  padding: 25px;
-  font-size: 30px;
-  font-weight: bold;
-}
-
-.container {
-  max-width: 1000px;
-  margin: auto;
-  background: white;
-  color: black;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-label {
-  font-weight: bold;
-  display: block;
-  margin-bottom: 5px;
-}
-
-input, select {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-input:focus, select:focus {
-  outline: none;
-  border-color: #2a5298;
-  box-shadow: 0 0 5px #2a5298;
-}
-
-button {
-  margin-top: 25px;
-  width: 100%;
-  padding: 14px;
-  background: #2a5298;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 18px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-button:hover {
-  background: #1e3c72;
-}
-
-.result {
-  margin-top: 20px;
-  padding: 15px;
-  border-radius: 8px;
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.churn { background: #ff4d4d; color: white; }
-.no-churn { background: #4CAF50; color: white; }
-
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroChurn Studio</title>
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet">
+  <style>
+    :root,[data-theme="light"]{
+      --text-xs:clamp(.75rem,.7rem + .25vw,.875rem);
+      --text-sm:clamp(.875rem,.8rem + .35vw,1rem);
+      --text-base:clamp(1rem,.95rem + .25vw,1.05rem);
+      --text-lg:clamp(1.125rem,1rem + .75vw,1.45rem);
+      --text-xl:clamp(1.45rem,1.1rem + 1.2vw,2.2rem);
+      --text-hero:clamp(2rem,1.4rem + 3vw,4rem);
+      --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;--space-12:3rem;--space-16:4rem;
+      --bg:#f6f5f1;--surface:#f9f8f4;--surface-2:#ffffff;--surface-3:#f0ede7;--border:#dbd7cf;--divider:#e5e1da;
+      --text:#1f1d18;--text-muted:#66635d;--text-soft:#939089;--text-inverse:#fbfaf7;
+      --primary:#0b6d73;--primary-2:#0b4e53;--primary-soft:#d3e5e2;
+      --success:#3f7d2b;--warning:#b86b1d;--danger:#ae3567;--blue:#2f6fa9;
+      --shadow-sm:0 8px 24px rgba(27,25,22,.05);--shadow-md:0 18px 44px rgba(27,25,22,.09);--shadow-lg:0 30px 70px rgba(27,25,22,.16);
+      --radius-sm:.75rem;--radius-md:1rem;--radius-lg:1.5rem;--radius-xl:2rem;--radius-full:9999px;
+      --font:'Satoshi',system-ui,sans-serif;
+      --ease:200ms cubic-bezier(.16,1,.3,1);
+    }
+    [data-theme="dark"]{
+      --bg:#131311;--surface:#191917;--surface-2:#21211e;--surface-3:#2a2926;--border:#36342f;--divider:#2b2a26;
+      --text:#d8d5cf;--text-muted:#aaa59d;--text-soft:#77736d;--text-inverse:#131311;
+      --primary:#4f9ea8;--primary-2:#2a7f88;--primary-soft:#243839;
+      --success:#77b452;--warning:#d68a41;--danger:#db5e95;--blue:#71a7d7;
+      --shadow-sm:0 8px 24px rgba(0,0,0,.22);--shadow-md:0 18px 44px rgba(0,0,0,.30);--shadow-lg:0 30px 70px rgba(0,0,0,.44);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:var(--text-base);line-height:1.55;min-height:100dvh;background-image:radial-gradient(circle at top right, color-mix(in srgb,var(--primary) 8%,transparent), transparent 28%), radial-gradient(circle at bottom left, color-mix(in srgb,var(--blue) 7%,transparent), transparent 24%)}
+    img,svg{display:block;max-width:100%}
+    button,input,select{font:inherit;color:inherit}
+    button{cursor:pointer}
+    .shell{max-width:1500px;margin-inline:auto;padding:var(--space-4)}
+    .app{display:grid;grid-template-columns:290px 1fr;gap:var(--space-4);min-height:calc(100dvh - 2rem)}
+    .sidebar,.panel,.stat,.hero-card,.glass{background:color-mix(in srgb,var(--surface) 88%, transparent);border:1px solid var(--border);box-shadow:var(--shadow-sm);backdrop-filter:blur(18px)}
+    .sidebar{border-radius:var(--radius-xl);padding:var(--space-5);display:flex;flex-direction:column;gap:var(--space-5);position:sticky;top:1rem;height:calc(100dvh - 2rem)}
+    .logo{display:flex;gap:var(--space-3);align-items:center}
+    .logo-mark{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),color-mix(in srgb,var(--primary) 52%,white));color:var(--text-inverse);box-shadow:var(--shadow-sm)}
+    .logo h1{font-size:var(--text-lg);line-height:1.05}
+    .small{font-size:var(--text-xs);color:var(--text-muted)}
+    .menu{display:grid;gap:var(--space-2)}
+    .menu-item{padding:var(--space-3);border-radius:var(--radius-md);background:var(--surface-2);border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:var(--space-2)}
+    .dot{width:10px;height:10px;border-radius:50%;background:var(--success)}
+    .main{display:grid;gap:var(--space-4)}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:var(--space-4);padding:var(--space-3) var(--space-2)}
+    .headline h2{font-size:var(--text-xl);line-height:1.05}
+    .headline p{margin-top:.35rem;color:var(--text-muted)}
+    .toolbar{display:flex;gap:var(--space-3);align-items:center;flex-wrap:wrap}
+    .btn{min-height:46px;padding:.9rem 1.15rem;border-radius:var(--radius-full);border:1px solid transparent;font-weight:700;transition:transform var(--ease),background var(--ease),border-color var(--ease),box-shadow var(--ease)}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--primary);color:var(--text-inverse);box-shadow:var(--shadow-sm)}
+    .btn-primary:hover{background:var(--primary-2)}
+    .btn-soft{background:var(--surface-2);border-color:var(--border)}
+    .icon-btn{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);border:1px solid var(--border)}
+    .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:var(--space-4)}
+    .hero-card{border-radius:var(--radius-xl);padding:var(--space-6);position:relative;overflow:hidden}
+    .hero-card::after{content:"";position:absolute;inset:auto -10% -30% auto;width:280px;height:280px;background:radial-gradient(circle, color-mix(in srgb,var(--primary) 16%,transparent), transparent 62%);pointer-events:none}
+    .eyebrow{display:inline-flex;align-items:center;gap:.5rem;padding:.45rem .8rem;border-radius:var(--radius-full);background:var(--primary-soft);color:var(--primary);font-size:var(--text-xs);font-weight:800;letter-spacing:.02em}
+    .hero h3{font-size:var(--text-hero);line-height:.95;letter-spacing:-.03em;max-width:11ch;margin-top:var(--space-4)}
+    .hero p{max-width:60ch;margin-top:var(--space-4);color:var(--text-muted)}
+    .cta-row{display:flex;gap:var(--space-3);flex-wrap:wrap;margin-top:var(--space-5)}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3);margin-top:var(--space-6)}
+    .stat{padding:var(--space-4);border-radius:var(--radius-lg)}
+    .stat span{display:block;font-size:var(--text-xs);color:var(--text-muted);margin-bottom:.35rem}
+    .stat strong{font-size:var(--text-lg);font-variant-numeric:tabular-nums}
+    .right-stack{display:grid;gap:var(--space-4)}
+    .mini-panel{padding:var(--space-5);border-radius:var(--radius-xl)}
+    .risk-bars{height:160px;display:flex;align-items:end;gap:10px;margin-top:var(--space-4)}
+    .risk-bars div{flex:1;border-radius:999px 999px 0 0;background:linear-gradient(180deg,var(--primary),color-mix(in srgb,var(--blue) 38%,var(--primary)));box-shadow:inset 0 -18px 28px rgba(255,255,255,.09)}
+    .core{display:grid;grid-template-columns:1.08fr .92fr;gap:var(--space-4)}
+    .panel{border-radius:var(--radius-xl);padding:var(--space-5)}
+    .panel-head{display:flex;justify-content:space-between;align-items:end;gap:var(--space-4);margin-bottom:var(--space-5)}
+    .panel-head h4{font-size:var(--text-lg)}
+    .muted{color:var(--text-muted)}
+    .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
+    .field{display:grid;gap:var(--space-2)}
+    .field.full{grid-column:1/-1}
+    label{font-size:var(--text-sm);font-weight:700}
+    input,select{width:100%;min-height:50px;padding:.95rem 1rem;border-radius:1rem;border:1px solid var(--border);background:var(--surface-2);outline:none;transition:border-color var(--ease),box-shadow var(--ease),transform var(--ease)}
+    input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px color-mix(in srgb,var(--primary) 18%,transparent)}
+    .hint{font-size:var(--text-xs);color:var(--text-muted)}
+    .predict-actions{display:flex;gap:var(--space-3);flex-wrap:wrap;margin-top:var(--space-5)}
+    .output-grid{display:grid;gap:var(--space-4)}
+    .score-card{padding:var(--space-5);border-radius:var(--radius-lg);background:var(--surface-2);border:1px solid var(--border)}
+    .score-head{display:flex;justify-content:space-between;align-items:start;gap:var(--space-3)}
+    .score-big{font-size:clamp(2.5rem,2rem + 2vw,4.2rem);font-weight:900;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.04em}
+    .tag{display:inline-flex;align-items:center;gap:.45rem;padding:.48rem .75rem;border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:800;border:1px solid var(--border);background:var(--surface-3)}
+    .meter{margin-top:var(--space-4);height:16px;border-radius:999px;background:var(--surface-3);overflow:hidden;border:1px solid var(--border)}
+    .meter-fill{height:100%;width:0%;transition:width .85s cubic-bezier(.16,1,.3,1);background:linear-gradient(90deg,var(--success),var(--warning),var(--danger))}
+    .subtext{margin-top:var(--space-3);color:var(--text-muted)}
+    .driver-list,.action-list,.insight-grid{display:grid;gap:var(--space-3)}
+    .driver{display:flex;justify-content:space-between;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);background:var(--surface-2);border:1px solid var(--border)}
+    .driver strong{font-size:var(--text-sm)}
+    .bar-track{flex:1;height:10px;border-radius:999px;background:var(--surface-3);overflow:hidden;margin-inline:var(--space-3)}
+    .bar-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--blue));border-radius:999px}
+    .impact{font-size:var(--text-xs);font-weight:800;color:var(--text-muted);min-width:48px;text-align:right}
+    .action{padding:var(--space-4);border-radius:var(--radius-md);background:var(--surface-2);border:1px solid var(--border)}
+    .action h5{font-size:var(--text-sm);margin-bottom:.2rem}
+    .insight-grid{grid-template-columns:1fr 1fr}
+    .insight{padding:var(--space-4);border-radius:var(--radius-md);background:var(--surface-2);border:1px solid var(--border)}
+    .pill-row{display:flex;flex-wrap:wrap;gap:var(--space-2)}
+    .pill{padding:.45rem .72rem;border-radius:var(--radius-full);background:var(--surface-3);font-size:var(--text-xs);font-weight:700}
+    .footer-note{font-size:var(--text-xs);color:var(--text-muted);padding-top:var(--space-2)}
+    .mobile-menu{display:none}
+    @media (max-width:1180px){.hero,.core{grid-template-columns:1fr}.stats,.insight-grid{grid-template-columns:1fr 1fr}}
+    @media (max-width:920px){.app{grid-template-columns:1fr}.sidebar{display:none;position:fixed;inset:1rem auto 1rem 1rem;width:min(86vw,320px);z-index:100}.sidebar.open{display:flex}.mobile-menu{display:grid}.shell{padding:var(--space-3)}.headline h2{font-size:1.8rem}}
+    @media (max-width:680px){.form-grid,.stats,.insight-grid{grid-template-columns:1fr}.hero-card,.panel,.mini-panel{padding:var(--space-4)}.topbar{align-items:flex-start;flex-direction:column}.toolbar{width:100%}.btn{flex:1 1 auto}}
+  </style>
 </head>
-
 <body>
+  <div class="shell">
+    <div class="app">
+      <aside class="sidebar" id="sidebar">
+        <div class="logo">
+          <div class="logo-mark">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" aria-label="NeuroChurn logo">
+              <path d="M4 16c1.6-4.2 4.2-6 7.4-6 2.7 0 5.2 1.1 8.6-4" stroke-linecap="round"/>
+              <circle cx="4" cy="16" r="1.7" fill="currentColor" stroke="none"/>
+              <circle cx="20" cy="6" r="1.7" fill="currentColor" stroke="none"/>
+              <path d="M7 20h10" stroke-linecap="round" opacity=".45"/>
+            </svg>
+          </div>
+          <div>
+            <h1>NeuroChurn</h1>
+            <p class="small">Predictive retention studio</p>
+          </div>
+        </div>
 
-<header> Customer Churn Prediction</header>
+        <div class="menu">
+          <div class="menu-item"><span>Scoring engine</span><strong>Boosted logic</strong></div>
+          <div class="menu-item"><span>Deployment mode</span><strong>Front-end app</strong></div>
+          <div class="menu-item"><span>Feature coverage</span><strong>Training-aligned</strong></div>
+          <div class="menu-item"><span>Health</span><span class="dot"></span></div>
+        </div>
 
-<div class="container">
+        <div class="glass panel" style="padding:var(--space-4)">
+          <p class="muted">This rebuilt UI keeps your premium dashboard design but adds the missing CLTV field and full front-end demo scoring. For live prediction, connect your trained model and one-hot encoding pipeline in Flask or FastAPI.</p>
+        </div>
+      </aside>
 
-<form action="/predict" method="post">
+      <main class="main">
+        <div class="topbar">
+          <div class="headline">
+            <h2>Telecom churn prediction control room</h2>
+            <p>Fill all training-aligned profile fields, generate risk probability, inspect churn drivers, and review action guidance in one clean workflow.</p>
+          </div>
+          <div class="toolbar">
+            <button class="icon-btn mobile-menu" id="menuBtn" aria-label="Open menu">☰</button>
+            <button class="icon-btn" id="themeBtn" aria-label="Toggle theme">◐</button>
+            <button class="btn btn-soft" id="sampleHigh">High-risk demo</button>
+            <button class="btn btn-soft" id="sampleLow">Low-risk demo</button>
+            <button class="btn btn-primary" id="predictTop">Predict</button>
+          </div>
+        </div>
 
-<div class="grid">
+        <section class="hero">
+          <article class="hero-card">
+            <span class="eyebrow">Decision-ready churn intelligence</span>
+            <h3>See which customers may leave before they do.</h3>
+            <p>Built as a premium project front-end with a smarter layout, stronger visual hierarchy, better output storytelling, and a cleaner scoring experience than a basic form page.</p>
+            <div class="cta-row">
+              <button class="btn btn-primary" id="heroPredict">Run instant prediction</button>
+              <button class="btn btn-soft" id="heroReset">Reset inputs</button>
+            </div>
+            <div class="stats">
+              <div class="stat"><span>Prediction mode</span><strong>Real-time</strong></div>
+              <div class="stat"><span>Core output</span><strong>Probability + drivers</strong></div>
+              <div class="stat"><span>Feature coverage</span><strong>CLTV included</strong></div>
+            </div>
+          </article>
+          <div class="right-stack">
+            <div class="panel mini-panel">
+              <div class="panel-head" style="margin-bottom:0">
+                <div>
+                  <h4>Exposure pattern</h4>
+                  <p class="small">Visual pulse of high-risk account behavior</p>
+                </div>
+              </div>
+              <div class="risk-bars" aria-hidden="true">
+                <div style="height:26%"></div>
+                <div style="height:40%"></div>
+                <div style="height:52%"></div>
+                <div style="height:49%"></div>
+                <div style="height:76%"></div>
+                <div style="height:92%"></div>
+                <div style="height:68%"></div>
+              </div>
+            </div>
+            <div class="panel mini-panel">
+              <div class="panel-head">
+                <div>
+                  <h4>Frequent churn signals</h4>
+                  <p class="small">Most common features associated with risk</p>
+                </div>
+              </div>
+              <div class="pill-row">
+                <span class="pill">Short tenure</span>
+                <span class="pill">Month-to-month</span>
+                <span class="pill">Electronic check</span>
+                <span class="pill">Fiber optic</span>
+                <span class="pill">High charges</span>
+                <span class="pill">Low CLTV</span>
+              </div>
+            </div>
+          </div>
+        </section>
 
-<div>
-<label>Gender</label>
-<select name="Gender">
-<option value="1">Male</option>
-<option value="0">Female</option>
-</select>
-</div>
+        <section class="core">
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h4>Customer feature input</h4>
+                <p class="muted">Inputs are aligned to your training features, including the missing CLTV field and all key raw fields needed for encoded columns.</p>
+              </div>
+            </div>
 
-<div>
-<label>Senior Citizen</label>
-<select name="SeniorCitizen">
-<option value="1">Yes</option>
-<option value="0">No</option>
-</select>
-</div>
+            <form id="churnForm" class="form-grid">
+              <div class="field"><label for="gender">Gender</label><select id="gender"><option>Male</option><option>Female</option></select></div>
+              <div class="field"><label for="senior">Senior Citizen</label><select id="senior"><option>No</option><option>Yes</option></select></div>
+              <div class="field"><label for="partner">Partner</label><select id="partner"><option>No</option><option>Yes</option></select></div>
+              <div class="field"><label for="dependents">Dependents</label><select id="dependents"><option>No</option><option>Yes</option></select></div>
 
-<div>
-<label>Partner</label>
-<select name="Partner">
-<option value="1">Yes</option>
-<option value="0">No</option>
-</select>
-</div>
+              <div class="field"><label for="tenure">Tenure Months</label><input id="tenure" type="number" min="0" max="120" value="10"></div>
+              <div class="field"><label for="phoneService">Phone Service</label><select id="phoneService"><option>Yes</option><option>No</option></select></div>
 
-<div>
-<label>Dependents</label>
-<select name="Dependents">
-<option value="1">Yes</option>
-<option value="0">No</option>
-</select>
-</div>
+              <div class="field"><label for="multipleLines">Multiple Lines</label><select id="multipleLines"><option>No</option><option>Yes</option><option>No phone service</option></select></div>
+              <div class="field"><label for="internetService">Internet Service</label><select id="internetService"><option>Fiber optic</option><option>DSL</option><option>No</option></select></div>
 
-<div>
-<label>Phone Service</label>
-<select name="PhoneService">
-<option value="1">Yes</option>
-<option value="0">No</option>
-</select>
-</div>
+              <div class="field"><label for="onlineSecurity">Online Security</label><select id="onlineSecurity"><option>No</option><option>Yes</option><option>No internet service</option></select></div>
+              <div class="field"><label for="onlineBackup">Online Backup</label><select id="onlineBackup"><option>No</option><option>Yes</option><option>No internet service</option></select></div>
 
-<div>
-<label>Paperless Billing</label>
-<select name="PaperlessBilling">
-<option value="1">Yes</option>
-<option value="0">No</option>
-</select>
-</div>
+              <div class="field"><label for="deviceProtection">Device Protection</label><select id="deviceProtection"><option>No</option><option>Yes</option><option>No internet service</option></select></div>
+              <div class="field"><label for="techSupport">Tech Support</label><select id="techSupport"><option>No</option><option>Yes</option><option>No internet service</option></select></div>
 
-<div>
-<label>Tenure (Months)</label>
-<input type="number" name="Tenure" placeholder="Enter months" required>
-</div>
+              <div class="field"><label for="streamingTV">Streaming TV</label><select id="streamingTV"><option>No</option><option>Yes</option><option>No internet service</option></select></div>
+              <div class="field"><label for="streamingMovies">Streaming Movies</label><select id="streamingMovies"><option>No</option><option>Yes</option><option>No internet service</option></select></div>
 
-<div>
-<label>Monthly Charges</label>
-<input type="number" name="MonthlyCharges" placeholder="Enter amount" required>
-</div>
+              <div class="field"><label for="contract">Contract</label><select id="contract"><option>Month-to-month</option><option>One year</option><option>Two year</option></select></div>
+              <div class="field"><label for="paperless">Paperless Billing</label><select id="paperless"><option>Yes</option><option>No</option></select></div>
 
-<div>
-<label>Total Charges</label>
-<input type="number" name="TotalCharges" placeholder="Enter total" required>
-</div>
+              <div class="field"><label for="paymentMethod">Payment Method</label><select id="paymentMethod"><option>Electronic check</option><option>Bank transfer (automatic)</option><option>Credit card (automatic)</option><option>Mailed check</option></select></div>
+              <div class="field"><label for="monthlyCharges">Monthly Charges</label><input id="monthlyCharges" type="number" min="0" step="0.01" value="70.00"></div>
 
-<div>
-<label>CLTV</label>
-<input type="number" name="CLTV" placeholder="Customer lifetime value" required>
-</div>
+              <div class="field"><label for="totalCharges">Total Charges</label><input id="totalCharges" type="number" min="0" step="0.01" value="700.00"></div>
+              <div class="field"><label for="cltv">CLTV</label><input id="cltv" type="number" min="0" step="1" value="2500"></div>
+            </form>
 
-<div>
-<label>Contract</label>
-<select name="Contract">
-<option value="Month-to-month">Month</option>
-<option value="One year">1 Year</option>
-<option value="Two year">2 Year</option>
-</select>
-</div>
+            <div class="predict-actions">
+              <button type="button" class="btn btn-primary" id="predictMain">Predict churn risk</button>
+              <button type="button" class="btn btn-soft" id="resetMain">Reset form</button>
+            </div>
+          </section>
 
-<div>
-<label>Internet Service</label>
-<select name="InternetService">
-<option value="DSL">DSL</option>
-<option value="Fiber optic">Fiber</option>
-<option value="No">No</option>
-</select>
-</div>
+          <section class="output-grid">
+            <article class="score-card">
+              <div class="score-head">
+                <div>
+                  <div class="tag" id="riskTag">Status: Ready</div>
+                  <div class="score-big" id="riskScore">0%</div>
+                </div>
+                <div class="hint" id="riskLabel">Awaiting prediction</div>
+              </div>
+              <div class="meter" aria-label="Churn probability meter">
+                <div class="meter-fill" id="meterFill"></div>
+              </div>
+              <p class="subtext" id="riskMessage">Enter customer details and click Predict to see a demo churn estimate.</p>
+            </article>
 
-<div>
-<label>Payment Method</label>
-<select name="PaymentMethod">
-<option value="Electronic check">Electronic</option>
-<option value="Mailed check">Mail</option>
-<option value="Bank transfer">Bank</option>
-<option value="Credit card">Card</option>
-</select>
-</div>
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <h4>Risk drivers</h4>
+                  <p class="small">What influenced the demo score most</p>
+                </div>
+              </div>
+              <div class="driver-list" id="driverList"></div>
+            </article>
 
-</div>
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <h4>Suggested action</h4>
+                  <p class="small">Recommended retention response</p>
+                </div>
+              </div>
+              <div class="action-list" id="actionList"></div>
+              <div class="footer-note">This is demo logic for front-end presentation. Replace it with your model + encoder pipeline in Flask for real production predictions.</div>
+            </article>
 
-<button type="submit">Predict Churn</button>
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <h4>Training feature coverage</h4>
+                  <p class="small">Raw input fields mapped for your encoded model columns</p>
+                </div>
+              </div>
+              <div class="insight-grid">
+                <div class="insight"><strong>Numeric</strong><p class="muted">Tenure, Monthly Charges, Total Charges, CLTV</p></div>
+                <div class="insight"><strong>Binary</strong><p class="muted">Gender, Senior Citizen, Partner, Dependents, Phone Service, Paperless Billing</p></div>
+                <div class="insight"><strong>Service</strong><p class="muted">Multiple Lines, Internet, Security, Backup, Device Protection, Tech Support</p></div>
+                <div class="insight"><strong>Commercial</strong><p class="muted">Contract, Payment Method, Streaming TV, Streaming Movies</p></div>
+              </div>
+            </article>
+          </section>
+        </section>
+      </main>
+    </div>
+  </div>
 
-</form>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const html = document.documentElement;
+      const sidebar = document.getElementById('sidebar');
+      const form = document.getElementById('churnForm');
+      const menuBtn = document.getElementById('menuBtn');
+      const themeBtn = document.getElementById('themeBtn');
+      const predictBtns = ['predictTop', 'heroPredict', 'predictMain'].map(id => document.getElementById(id));
+      const resetBtns = ['heroReset', 'resetMain'].map(id => document.getElementById(id));
+      const sampleHigh = document.getElementById('sampleHigh');
+      const sampleLow = document.getElementById('sampleLow');
 
-{% if prediction_text %}
-<div class="result {% if '⚠️' in prediction_text %}churn{% else %}no-churn{% endif %}">
-{{ prediction_text }}
-</div>
-{% endif %}
+      const riskScore = document.getElementById('riskScore');
+      const riskTag = document.getElementById('riskTag');
+      const riskLabel = document.getElementById('riskLabel');
+      const riskMessage = document.getElementById('riskMessage');
+      const meterFill = document.getElementById('meterFill');
+      const driverList = document.getElementById('driverList');
+      const actionList = document.getElementById('actionList');
 
-</div>
+      const fields = {
+        gender: document.getElementById('gender'),
+        senior: document.getElementById('senior'),
+        partner: document.getElementById('partner'),
+        dependents: document.getElementById('dependents'),
+        tenure: document.getElementById('tenure'),
+        phoneService: document.getElementById('phoneService'),
+        multipleLines: document.getElementById('multipleLines'),
+        internetService: document.getElementById('internetService'),
+        onlineSecurity: document.getElementById('onlineSecurity'),
+        onlineBackup: document.getElementById('onlineBackup'),
+        deviceProtection: document.getElementById('deviceProtection'),
+        techSupport: document.getElementById('techSupport'),
+        streamingTV: document.getElementById('streamingTV'),
+        streamingMovies: document.getElementById('streamingMovies'),
+        contract: document.getElementById('contract'),
+        paperless: document.getElementById('paperless'),
+        paymentMethod: document.getElementById('paymentMethod'),
+        monthlyCharges: document.getElementById('monthlyCharges'),
+        totalCharges: document.getElementById('totalCharges'),
+        cltv: document.getElementById('cltv')
+      };
 
+      const defaultValues = Object.fromEntries(
+        Object.entries(fields).map(([key, el]) => [key, el.value])
+      );
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function getNumber(el, fallback = 0) {
+        const value = Number(el.value);
+        return Number.isFinite(value) ? value : fallback;
+      }
+
+      function setTheme(nextTheme) {
+        html.setAttribute('data-theme', nextTheme);
+        themeBtn.setAttribute('aria-label', nextTheme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+      }
+
+      function deriveDrivers(values) {
+        const list = [];
+
+        if (values.contract === 'Month-to-month') list.push({ name: 'Contract length', impact: 92 });
+        else if (values.contract === 'One year') list.push({ name: 'Contract length', impact: 52 });
+        else list.push({ name: 'Contract length', impact: 18 });
+
+        if (values.tenure < 12) list.push({ name: 'Short tenure', impact: 86 });
+        else if (values.tenure < 24) list.push({ name: 'Tenure maturity', impact: 58 });
+        else list.push({ name: 'Tenure stability', impact: 24 });
+
+        if (values.monthlyCharges >= 90) list.push({ name: 'High monthly charges', impact: 82 });
+        else if (values.monthlyCharges >= 70) list.push({ name: 'Monthly charge pressure', impact: 64 });
+        else list.push({ name: 'Monthly charge pressure', impact: 28 });
+
+        if (values.cltv < 2000) list.push({ name: 'Low CLTV', impact: 73 });
+        else if (values.cltv < 3500) list.push({ name: 'Moderate CLTV', impact: 46 });
+        else list.push({ name: 'Strong CLTV', impact: 21 });
+
+        return list.slice(0, 4);
+      }
+
+      function renderActions(score) {
+        const actions = score >= 70
+          ? [
+              ['Immediate save campaign', 'Reach the customer quickly with a retention discount, tailored offer, or callback.'],
+              ['Review pricing and support', 'High charges, weak support, or short contract may be accelerating churn intent.']
+            ]
+          : score >= 40
+          ? [
+              ['Monitor closely', 'Keep the account on watchlist and trigger reminder or engagement campaigns.'],
+              ['Improve perceived value', 'Show benefits, product usage insights, or a plan optimization option.']
+            ]
+          : [
+              ['Maintain relationship', 'Customer appears stable; focus on satisfaction and loyalty touchpoints.'],
+              ['Cross-sell carefully', 'Upsell only when it increases value and not billing frustration.']
+            ];
+
+        actionList.innerHTML = '';
+        actions.forEach(([title, text]) => {
+          const card = document.createElement('div');
+          card.className = 'action';
+          card.innerHTML = `<h5>${title}</h5><p class="muted">${text}</p>`;
+          actionList.appendChild(card);
+        });
+      }
+
+      function renderDrivers(drivers) {
+        driverList.innerHTML = '';
+        drivers.forEach(driver => {
+          const item = document.createElement('div');
+          item.className = 'driver';
+          item.innerHTML = `
+            <strong>${driver.name}</strong>
+            <div class="bar-track"><div class="bar-fill" style="width:${driver.impact}%"></div></div>
+            <span class="impact">${driver.impact}%</span>
+          `;
+          driverList.appendChild(item);
+        });
+      }
+
+      function renderScore(score) {
+        const rounded = Math.round(score);
+        let label = 'Low risk';
+        let tag = 'Status: Stable';
+        let message = 'This customer appears relatively safe based on the current demo scoring logic.';
+
+        if (rounded >= 70) {
+          label = 'High risk';
+          tag = 'Status: At risk';
+          message = 'This profile shows strong churn signals and should be prioritized for retention.';
+        } else if (rounded >= 40) {
+          label = 'Medium risk';
+          tag = 'Status: Watchlist';
+          message = 'This customer has moderate churn exposure and may need preventive engagement.';
+        }
+
+        riskScore.textContent = `${rounded}%`;
+        riskTag.textContent = tag;
+        riskLabel.textContent = label;
+        riskMessage.textContent = message;
+        meterFill.style.width = `${rounded}%`;
+      }
+
+      function getValues() {
+        return {
+          gender: fields.gender.value,
+          senior: fields.senior.value,
+          partner: fields.partner.value,
+          dependents: fields.dependents.value,
+          tenure: clamp(getNumber(fields.tenure, 0), 0, 120),
+          phoneService: fields.phoneService.value,
+          multipleLines: fields.multipleLines.value,
+          internetService: fields.internetService.value,
+          onlineSecurity: fields.onlineSecurity.value,
+          onlineBackup: fields.onlineBackup.value,
+          deviceProtection: fields.deviceProtection.value,
+          techSupport: fields.techSupport.value,
+          streamingTV: fields.streamingTV.value,
+          streamingMovies: fields.streamingMovies.value,
+          contract: fields.contract.value,
+          paperless: fields.paperless.value,
+          paymentMethod: fields.paymentMethod.value,
+          monthlyCharges: clamp(getNumber(fields.monthlyCharges, 0), 0, 300),
+          totalCharges: clamp(getNumber(fields.totalCharges, 0), 0, 50000),
+          cltv: clamp(getNumber(fields.cltv, 0), 0, 200000)
+        };
+      }
+
+      function calculateScore(values) {
+        let score = 16;
+
+        score += values.tenure < 6 ? 26 : values.tenure < 12 ? 18 : values.tenure < 24 ? 10 : values.tenure < 48 ? 3 : -8;
+        score += values.monthlyCharges >= 90 ? 18 : values.monthlyCharges >= 70 ? 12 : values.monthlyCharges >= 50 ? 6 : -3;
+        score += values.contract === 'Month-to-month' ? 24 : values.contract === 'One year' ? 6 : -14;
+        score += values.paymentMethod === 'Electronic check' ? 8 : values.paymentMethod === 'Mailed check' ? 4 : -2;
+        score += values.internetService === 'Fiber optic' ? 7 : values.internetService === 'No' ? -6 : 2;
+        score += values.techSupport === 'No' ? 8 : values.techSupport === 'Yes' ? -8 : 0;
+        score += values.onlineSecurity === 'No' ? 6 : values.onlineSecurity === 'Yes' ? -6 : 0;
+        score += values.paperless === 'Yes' ? 4 : 0;
+        score += values.senior === 'Yes' ? 4 : 0;
+        score += values.partner === 'No' ? 3 : -2;
+        score += values.dependents === 'No' ? 2 : -1;
+        score += values.multipleLines === 'Yes' ? 3 : 0;
+        score += values.streamingTV === 'Yes' ? 2 : 0;
+        score += values.streamingMovies === 'Yes' ? 2 : 0;
+        score += values.totalCharges < values.tenure * values.monthlyCharges * 0.7 ? 5 : -1;
+        score += values.cltv < 2000 ? 12 : values.cltv < 3500 ? 6 : values.cltv > 5000 ? -10 : 0;
+
+        return clamp(score, 1, 99);
+      }
+
+      function predictChurn() {
+        const values = getValues();
+        const score = calculateScore(values);
+        const drivers = deriveDrivers(values);
+
+        renderScore(score);
+        renderDrivers(drivers);
+        renderActions(score);
+      }
+
+      function resetDashboard() {
+        Object.entries(defaultValues).forEach(([key, value]) => {
+          fields[key].value = value;
+        });
+
+        riskScore.textContent = '0%';
+        riskTag.textContent = 'Status: Ready';
+        riskLabel.textContent = 'Awaiting prediction';
+        riskMessage.textContent = 'Enter customer details and click Predict to see a demo churn estimate.';
+        meterFill.style.width = '0%';
+        driverList.innerHTML = '';
+        actionList.innerHTML = '';
+      }
+
+      function applySample(type) {
+        if (type === 'high') {
+          fields.gender.value = 'Female';
+          fields.senior.value = 'Yes';
+          fields.partner.value = 'No';
+          fields.dependents.value = 'No';
+          fields.tenure.value = 3;
+          fields.phoneService.value = 'Yes';
+          fields.multipleLines.value = 'Yes';
+          fields.internetService.value = 'Fiber optic';
+          fields.onlineSecurity.value = 'No';
+          fields.onlineBackup.value = 'No';
+          fields.deviceProtection.value = 'No';
+          fields.techSupport.value = 'No';
+          fields.streamingTV.value = 'Yes';
+          fields.streamingMovies.value = 'Yes';
+          fields.contract.value = 'Month-to-month';
+          fields.paperless.value = 'Yes';
+          fields.paymentMethod.value = 'Electronic check';
+          fields.monthlyCharges.value = 99.85;
+          fields.totalCharges.value = 280.45;
+          fields.cltv.value = 1450;
+        } else {
+          fields.gender.value = 'Male';
+          fields.senior.value = 'No';
+          fields.partner.value = 'Yes';
+          fields.dependents.value = 'Yes';
+          fields.tenure.value = 58;
+          fields.phoneService.value = 'Yes';
+          fields.multipleLines.value = 'No';
+          fields.internetService.value = 'DSL';
+          fields.onlineSecurity.value = 'Yes';
+          fields.onlineBackup.value = 'Yes';
+          fields.deviceProtection.value = 'Yes';
+          fields.techSupport.value = 'Yes';
+          fields.streamingTV.value = 'No';
+          fields.streamingMovies.value = 'No';
+          fields.contract.value = 'Two year';
+          fields.paperless.value = 'No';
+          fields.paymentMethod.value = 'Credit card (automatic)';
+          fields.monthlyCharges.value = 42.50;
+          fields.totalCharges.value = 2465.00;
+          fields.cltv.value = 6125;
+        }
+
+        predictChurn();
+      }
+
+      predictBtns.forEach(btn => btn && btn.addEventListener('click', predictChurn));
+      resetBtns.forEach(btn => btn && btn.addEventListener('click', resetDashboard));
+      sampleHigh && sampleHigh.addEventListener('click', () => applySample('high'));
+      sampleLow && sampleLow.addEventListener('click', () => applySample('low'));
+
+      themeBtn && themeBtn.addEventListener('click', () => {
+        const nextTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        setTheme(nextTheme);
+      });
+
+      menuBtn && menuBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!sidebar.classList.contains('open')) return;
+        if (sidebar.contains(event.target) || menuBtn.contains(event.target)) return;
+        sidebar.classList.remove('open');
+      });
+
+      form && form.addEventListener('submit', event => event.preventDefault());
+
+      setTheme('light');
+      resetDashboard();
+    });
+  </script>
 </body>
 </html>
