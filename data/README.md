@@ -99,50 +99,28 @@ These variables help the model capture behavioral, financial, and service-relate
 The model shows strong predictive performance for churn classification. Based on the uploaded evaluation visuals, the ROC-AUC score is **0.89**, while the Average Precision score is **0.72**, indicating that the model performs well in separating churning and non-churning customers while maintaining useful precision-recall balance [file:37][file:36].
 
 ### ROC Curve
-
+"ROC Curve" (https://github.com/abubakar23813/churn-prediction-project/blob/main/images/ROC%20Curve.png)
 The ROC Curve measures the model’s ability to distinguish between churn and non-churn classes across different classification thresholds. The uploaded graph reports an AUC of **0.89**, which reflects strong overall discrimination performance [file:37].
 
-<p align="center">
-  <img src="images/ROC Curve.png" alt="ROC Curve" width="700"/>
-</p>
-
 ### Precision-Recall Curve
-
+"PR Curve" (https://github.com/abubakar23813/churn-prediction-project/blob/main/images/Precision_Recall%20Curve.png)
 The Precision-Recall Curve is especially useful for churn prediction because such datasets are commonly imbalanced. The uploaded graph reports an Average Precision of **0.72**, which shows that the model maintains good precision as recall increases [file:36].
 
-<p align="center">
-  <img src="images/Precision_Recall Curve.png" alt="Precision Recall Curve" width="700"/>
-</p>
 
 ### Confusion Matrix
-
+"Confusion Matrix" (https://raw.githubusercontent.com/abubakar23813/churn-prediction-project/main/images/confusion_matrix.png)
 The confusion matrix gives a direct overview of prediction outcomes. According to the uploaded matrix, the model produced **744 true negatives**, **291 false positives**, **36 false negatives**, and **338 true positives**, which shows that the classifier is effective at detecting churn while still making some trade-offs between sensitivity and false alarms [file:35].
-
-<p align="center">
-  <img src="images/confusion_matrix.png" alt="Confusion Matrix" width="650"/>
-</p>
 
 ---
 
 ## Feature Importance
-
+"Feature Importance" (https://github.com/abubakar23813/churn-prediction-project/blob/main/images/Top%2010%20Feature%20Importance.png)
 Feature importance analysis reveals which variables contribute most to the model’s predictions. In the uploaded chart, **Contract_Two year** is the most influential feature, followed by **Contract_One year**, **Payment Method_Electronic check**, and multiple service-related variables [file:33].
 
-<p align="center">
-  <img src="images/Top 10 Feature Importance.png" alt="Top 10 Feature Importance" width="700"/>
-</p>
-
----
-
 ## Model Explainability with SHAP
-
+"SHAP" (https://github.com/abubakar23813/churn-prediction-project/blob/main/images/Shap%20Value.png)
 To make the model more transparent, SHAP analysis was used to understand how features influence predictions. The uploaded SHAP summary plot shows both feature importance and the direction of impact, making it easier to explain why the model predicts churn for specific customer profiles [file:34].
 
-<p align="center">
-  <img src="images/Shap Value.png" alt="SHAP Summary Plot" width="700"/>
-</p>
-
----
 
 ## Key Business Insights
 
@@ -162,19 +140,37 @@ This project also includes a Flask-based web application where users can input c
 
 ```bash
 CHURN-PREDICTION-PROJECT/
-│
 ├── data/
-├── images/
+│   ├── Telco_customer_churn1.xlsx   # Raw dataset
+│   ├── README.md                    # Data documentation
+│   └── requirments.txt              # Project dependencies
+├── images/                          # Visual Evaluation Metrics
 │   ├── confusion_matrix.png
 │   ├── Precision_Recall Curve.png
 │   ├── ROC Curve.png
 │   ├── Shap Value.png
 │   └── Top 10 Feature Importance.png
-│
 ├── templates/
-    
-├── app.py
-├── churn_analysis.py
-├── churn_model.pkl
-├── columns.pkl
-└── README.md
+│   └── index.html                   # Flask Web Frontend
+├── app.py                           # Application Server
+├── churn_analysis.py                # Analysis & Training Pipeline
+├── churn_model.pkl                  # Serialized Model
+└── columns.pkl                      # Feature Metadata
+
+Installation & Usage
+1.Clone the repo:  git clone https://github.com/yourusername/CHURN-PREDICTION-PROJECT.git
+cd CHURN-PREDICTION-PROJECT
+2.Install requirements:  pip install -r data/requirments.txt
+3.Launch the Application: python app.py
+
+Access the app at http://127.0.0.1:5000
+
+Tech Stack
+Language: Python 3.9+
+Libraries: Pandas, Scikit-Learn, SHAP, Matplotlib, Seaborn
+Deployment: Flask, Jinja2 (HTML Templates)
+Storage: Pickle (Model Serialization)
+✍️ Author
+[ARHAM QURAISHI]
+Data Science Enthusiast | B.Com Student
+Note: This project is part of my Data Science portfolio focusing on business analytics and predictive modeling.
