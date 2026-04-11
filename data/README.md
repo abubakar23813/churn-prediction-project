@@ -10,7 +10,11 @@
 <p align="center">
   <b>An end-to-end telecom customer churn prediction project built with machine learning, explainable AI, and a Flask-based web application.</b>
 </p>
+## Live Demo
 
+Click here to access the deployed application:
+
+https://churn-prediction-project-h4ar.onrender.com/
 
 Problem Statement
 
